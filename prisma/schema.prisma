@@ -18,34 +18,34 @@ model Warehouse {
   isPrimary Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
-  stocks    Stock[]
-  
+
+  stocks Stock[]
+
   @@map("warehouses")
 }
 
 model Stock {
-  id           String    @id @default(uuid())
-  sku          String    // References Product.sku in Catalog service
-  warehouseId  String
-  warehouse    Warehouse @relation(fields: [warehouseId], references: [id])
-  
-  quantity     Int       @default(0) // Total available
-  reserved     Int       @default(0) // Reserved for pending orders
-  available    Int       @default(0) // Computed: quantity - reserved
-  
-  minThreshold Int       @default(5)  // Alert when stock below this
-  maxCapacity  Int?      // Maximum stock capacity
-  
-  version      Int       @default(0) // Optimistic locking
-  lastStockAt  DateTime?  // Last time stock was updated
-  
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  
+  id          String    @id @default(uuid())
+  sku         String // References Product.sku in Catalog service
+  warehouseId String
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+
+  quantity  Int @default(0) // Total available
+  reserved  Int @default(0) // Reserved for pending orders
+  available Int @default(0) // Computed: quantity - reserved
+
+  minThreshold Int  @default(5) // Alert when stock below this
+  maxCapacity  Int? // Maximum stock capacity
+
+  version     Int       @default(0) // Optimistic locking
+  lastStockAt DateTime? // Last time stock was updated
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   movements    StockMovement[]
   reservations StockReservation[]
-  
+
   @@unique([sku, warehouseId])
   @@index([sku])
   @@index([warehouseId])
@@ -54,23 +54,23 @@ model Stock {
 }
 
 model StockMovement {
-  id          String       @id @default(uuid())
-  stockId     String
-  stock       Stock        @relation(fields: [stockId], references: [id])
-  
+  id      String @id @default(uuid())
+  stockId String
+  stock   Stock  @relation(fields: [stockId], references: [id])
+
   type        MovementType
   quantity    Int
   reason      String?
   referenceId String?
-  
-  beforeQty   Int
-  afterQty    Int
-  
+
+  beforeQty Int
+  afterQty  Int
+
   performedBy String?
   notes       String?
-  
-  createdAt   DateTime     @default(now())
-  
+
+  createdAt DateTime @default(now())
+
   @@index([stockId])
   @@index([type])
   @@index([referenceId])
@@ -89,21 +89,21 @@ enum MovementType {
 }
 
 model StockReservation {
-  id         String            @id @default(uuid())
-  stockId    String
-  stock      Stock             @relation(fields: [stockId], references: [id])
-  
-  orderId    String            @unique
-  quantity   Int
-  status     ReservationStatus @default(ACTIVE)
-  
-  reservedAt DateTime          @default(now())
+  id      String @id @default(uuid())
+  stockId String
+  stock   Stock  @relation(fields: [stockId], references: [id])
+
+  orderId  String            @unique
+  quantity Int
+  status   ReservationStatus @default(ACTIVE)
+
+  reservedAt DateTime  @default(now())
   expiresAt  DateTime
   releasedAt DateTime?
-  
-  createdAt  DateTime          @default(now())
-  updatedAt  DateTime          @updatedAt
-  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@index([stockId])
   @@index([orderId])
   @@index([status])
@@ -131,7 +131,7 @@ model StockAlert {
   resolvedAt  DateTime?
   notifiedAt  DateTime?
   createdAt   DateTime      @default(now())
-  
+
   @@index([sku])
   @@index([isResolved])
   @@index([createdAt])
