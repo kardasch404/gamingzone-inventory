@@ -7,27 +7,146 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Product {
-  id          String   @id @default(uuid())
-  sku         String   @unique
-  name        String
-  description String?
-  quantity    Int      @default(0)
-  reserved    Int      @default(0)
-  price       Decimal  @db.Decimal(10, 2)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Warehouse {
+  id        String   @id @default(dbgenerated("uuid_generate_v7()"))
+  name      String   @unique
+  code      String   @unique
+  address   String?
+  city      String?
+  country   String   @default("Morocco")
+  isActive  Boolean  @default(true)
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@map("products")
+  stocks Stock[]
+
+  @@map("warehouses")
+}
+
+model Stock {
+  id          String    @id @default(dbgenerated("uuid_generate_v7()"))
+  sku         String // References Product.sku in Catalog service
+  warehouseId String
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+
+  quantity  Int @default(0) // Total available
+  reserved  Int @default(0) // Reserved for pending orders
+  available Int @default(0) // Computed: quantity - reserved
+
+  minThreshold Int  @default(5) // Alert when stock below this
+  maxCapacity  Int? // Maximum stock capacity
+
+  version     Int       @default(0) // Optimistic locking
+  lastStockAt DateTime? // Last time stock was updated
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  movements    StockMovement[]
+  reservations StockReservation[]
+
+  @@unique([sku, warehouseId])
+  @@index([sku])
+  @@index([warehouseId])
+  @@index([available])
+  @@map("stocks")
 }
 
 model StockMovement {
-  id        String   @id @default(uuid())
-  productId String
-  type      String
-  quantity  Int
-  reason    String?
+  id      String @id @default(dbgenerated("uuid_generate_v7()"))
+  stockId String
+  stock   Stock  @relation(fields: [stockId], references: [id])
+
+  type        MovementType
+  quantity    Int
+  reason      String?
+  referenceId String?
+
+  beforeQty Int
+  afterQty  Int
+
+  performedBy String?
+  notes       String?
+
   createdAt DateTime @default(now())
 
+  @@index([stockId])
+  @@index([type])
+  @@index([referenceId])
+  @@index([createdAt])
   @@map("stock_movements")
+}
+
+enum MovementType {
+  IN
+  OUT
+  ADJUSTMENT
+  RESERVED
+  RELEASED
+  DAMAGED
+  RETURNED
+}
+
+model StockReservation {
+  id      String @id @default(dbgenerated("uuid_generate_v7()"))
+  stockId String
+  stock   Stock  @relation(fields: [stockId], references: [id])
+
+  orderId  String            @unique
+  quantity Int
+  status   ReservationStatus @default(ACTIVE)
+
+  reservedAt DateTime  @default(now())
+  expiresAt  DateTime
+  releasedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([stockId])
+  @@index([orderId])
+  @@index([status])
+  @@index([expiresAt])
+  @@map("stock_reservations")
+}
+
+enum ReservationStatus {
+  ACTIVE
+  FULFILLED
+  RELEASED
+  EXPIRED
+}
+
+model StockAlert {
+  id          String        @id @default(dbgenerated("uuid_generate_v7()"))
+  sku         String
+  warehouseId String
+  alertType   AlertType
+  threshold   Int
+  currentQty  Int
+  message     String
+  severity    AlertSeverity
+  isResolved  Boolean       @default(false)
+  resolvedAt  DateTime?
+  notifiedAt  DateTime?
+  createdAt   DateTime      @default(now())
+
+  @@index([sku])
+  @@index([isResolved])
+  @@index([createdAt])
+  @@map("stock_alerts")
+}
+
+enum AlertType {
+  LOW_STOCK
+  OUT_OF_STOCK
+  OVER_CAPACITY
+  RESERVATION_EXPIRED
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
 }
