@@ -117,3 +117,36 @@ enum ReservationStatus {
   RELEASED
   EXPIRED
 }
+
+model StockAlert {
+  id          String        @id @default(uuid())
+  sku         String
+  warehouseId String
+  alertType   AlertType
+  threshold   Int
+  currentQty  Int
+  message     String
+  severity    AlertSeverity
+  isResolved  Boolean       @default(false)
+  resolvedAt  DateTime?
+  notifiedAt  DateTime?
+  createdAt   DateTime      @default(now())
+  
+  @@index([sku])
+  @@index([isResolved])
+  @@index([createdAt])
+  @@map("stock_alerts")
+}
+
+enum AlertType {
+  LOW_STOCK
+  OUT_OF_STOCK
+  OVER_CAPACITY
+  RESERVATION_EXPIRED
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
