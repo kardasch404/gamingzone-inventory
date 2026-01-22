@@ -7,27 +7,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Product {
-  id          String   @id @default(uuid())
-  sku         String   @unique
-  name        String
-  description String?
-  quantity    Int      @default(0)
-  reserved    Int      @default(0)
-  price       Decimal  @db.Decimal(10, 2)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@map("products")
-}
-
-model StockMovement {
-  id        String   @id @default(uuid())
-  productId String
-  type      String
-  quantity  Int
-  reason    String?
-  createdAt DateTime @default(now())
-
-  @@map("stock_movements")
+model Stock {
+  id           String    @id @default(uuid())
+  sku          String    // References Product.sku in Catalog service
+  warehouseId  String
+  
+  quantity     Int       @default(0) // Total available
+  reserved     Int       @default(0) // Reserved for pending orders
+  available    Int       @default(0) // Computed: quantity - reserved
+  
+  minThreshold Int       @default(5)  // Alert when stock below this
+  maxCapacity  Int?      // Maximum stock capacity
+  
+  version      Int       @default(0) // Optimistic locking
+  lastStockAt  DateTime?  // Last time stock was updated
+  
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  @@unique([sku, warehouseId])
+  @@index([sku])
+  @@index([warehouseId])
+  @@index([available])
+  @@map("stocks")
 }
