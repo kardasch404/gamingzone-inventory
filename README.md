@@ -1,98 +1,165 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Inventory Microservice
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Gaming Zone Inventory Management Microservice built with NestJS following Clean Architecture principles.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Architecture
 
-## Description
+This service follows **Clean Architecture** with clear separation of concerns:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ npm install
+```
+src/
+├── application/       # Use cases, DTOs, ports
+├── domain/           # Business entities, value objects, aggregates
+├── infrastructure/   # External implementations (DB, messaging, cache)
+├── presentation/     # Controllers, resolvers, guards, interceptors
+└── shared/          # Common utilities, config, exceptions
 ```
 
-## Compile and run the project
+## Tech Stack
+
+- **Framework**: NestJS
+- **Database**: PostgreSQL with Prisma ORM
+- **Cache**: Redis
+- **Messaging**: Apache Kafka
+- **RPC**: gRPC
+- **Language**: TypeScript
+
+## Prerequisites
+
+- Node.js >= 18
+- Docker & Docker Compose
+- PostgreSQL 15
+- Redis 7
+- Apache Kafka
+
+## Getting Started
+
+### 1. Install Dependencies
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
+### 2. Setup Environment
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+cp .env.example .env.development
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 3. Start Infrastructure
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+docker-compose up -d
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### 4. Run Database Migrations
 
-## Resources
+```bash
+npx prisma migrate dev
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+### 5. Start Development Server
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+npm run start:dev
+```
 
-## Support
+## Available Scripts
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+# Development
+npm run start:dev
 
-## Stay in touch
+# Production
+npm run build
+npm run start:prod
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+# Testing
+npm run test
+npm run test:e2e
+npm run test:cov
+
+# Database
+npx prisma migrate dev
+npx prisma studio
+```
+
+## Project Structure
+
+### Application Layer
+- **DTOs**: Request/Response data transfer objects
+- **Use Cases**: Business logic implementation (Commands & Queries)
+- **Ports**: Interfaces for external dependencies
+
+### Domain Layer
+- **Entities**: Core business entities
+- **Value Objects**: Immutable domain objects
+- **Aggregates**: Domain-driven design aggregates
+- **Events**: Domain events
+
+### Infrastructure Layer
+- **Database**: Prisma client and repositories
+- **Messaging**: Kafka producers/consumers
+- **Cache**: Redis implementation
+- **gRPC**: Protocol buffer services
+
+### Presentation Layer
+- **REST**: HTTP controllers
+- **GraphQL**: Resolvers and schemas
+- **gRPC**: gRPC controllers
+- **Guards**: Authentication and authorization
+- **Interceptors**: Logging, transformation, caching
+- **Filters**: Exception handling
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| NODE_ENV | Environment | development |
+| PORT | HTTP port | 3000 |
+| DATABASE_URL | PostgreSQL connection | - |
+| REDIS_HOST | Redis host | localhost |
+| REDIS_PORT | Redis port | 6379 |
+| KAFKA_BROKERS | Kafka brokers | localhost:9092 |
+| GRPC_PORT | gRPC port | 50051 |
+
+## Docker Support
+
+```bash
+# Development
+docker-compose up -d
+
+# Production
+docker build -t inventory-service .
+docker run -p 3000:3000 inventory-service
+```
+
+## API Documentation
+
+Once running, access:
+- Swagger UI: http://localhost:3000/api
+- Health Check: http://localhost:3000/health
+
+## Testing
+
+```bash
+# Unit tests
+npm run test
+
+# E2E tests
+npm run test:e2e
+
+# Test coverage
+npm run test:cov
+```
+
+## Contributing
+
+1. Create feature branch: `git checkout -b feature/INVENTORY-XXX-description`
+2. Commit changes: `git commit -m "type(scope): message"`
+3. Push branch: `git push origin feature/INVENTORY-XXX-description`
+4. Create Pull Request
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+MIT
