@@ -1,0 +1,131 @@
+### **Standard Service Structure**
+```
+service-name/
+├── src/
+│   ├── application/
+│   │   ├── dto/
+│   │   │   ├── request/          # Input DTOs
+│   │   │   ├── response/         # Output DTOs
+│   │   │   └── graphql/          # GraphQL types
+│   │   ├── use-cases/
+│   │   │   ├── commands/         # Write operations (CQRS)
+│   │   │   └── queries/          # Read operations (CQRS)
+│   │   ├── ports/
+│   │   │   ├── in/               # Input ports (interfaces)
+│   │   │   └── out/              # Output ports (repository interfaces)
+│   │   └── events/
+│   │       ├── handlers/         # Event handlers
+│   │       └── publishers/       # Event publishers
+│   ├── domain/
+│   │   ├── entities/             # Business entities
+│   │   ├── value-objects/        # Immutable value objects
+│   │   ├── aggregates/           # DDD aggregates
+│   │   ├── interfaces/           # Domain interfaces
+│   │   ├── exceptions/           # Domain exceptions
+│   │   └── events/               # Domain events
+│   ├── infrastructure/
+│   │   ├── database/
+│   │   │   ├── prisma/           # Prisma client & migrations
+│   │   │   ├── repositories/     # Repository implementations
+│   │   │   └── seeds/            # Database seeds
+│   │   ├── messaging/
+│   │   │   ├── kafka/            # Kafka producers/consumers
+│   │   │   └── events/           # Event schemas
+│   │   ├── external/
+│   │   │   ├── stripe/           # Stripe integration
+│   │   │   ├── aws/              # AWS services
+│   │   │   └── elastic/          # ElasticSearch
+│   │   ├── cache/
+│   │   │   └── redis/            # Redis implementation
+│   │   └── grpc/
+│   │       ├── proto/            # Protocol buffer definitions
+│   │       └── services/         # gRPC service implementations
+│   ├── presentation/
+│   │   ├── rest/
+│   │   │   ├── controllers/      # REST controllers
+│   │   │   └── routes/           # Route definitions
+│   │   ├── graphql/
+│   │   │   ├── resolvers/        # GraphQL resolvers
+│   │   │   ├── schemas/          # GraphQL schemas
+│   │   │   └── scalars/          # Custom scalars
+│   │   ├── grpc/
+│   │   │   └── controllers/      # gRPC controllers
+│   │   ├── websocket/
+│   │   │   └── gateways/         # WebSocket gateways
+│   │   ├── guards/
+│   │   │   ├── auth.guard.ts
+│   │   │   ├── permission.guard.ts
+│   │   │   └── rate-limit.guard.ts
+│   │   ├── interceptors/
+│   │   │   ├── logging.interceptor.ts
+│   │   │   ├── transform.interceptor.ts
+│   │   │   └── cache.interceptor.ts
+│   │   ├── filters/
+│   │   │   └── exception.filter.ts
+│   │   ├── pipes/
+│   │   │   └── validation.pipe.ts
+│   │   └── decorators/
+│   │       ├── current-user.decorator.ts
+│   │       └── permissions.decorator.ts
+│   ├── shared/
+│   │   ├── config/
+│   │   │   ├── app.config.ts
+│   │   │   ├── database.config.ts
+│   │   │   └── kafka.config.ts
+│   │   ├── constants/
+│   │   │   ├── events.constants.ts
+│   │   │   └── permissions.constants.ts
+│   │   ├── exceptions/
+│   │   │   ├── base.exception.ts
+│   │   │   └── custom-exceptions.ts
+│   │   ├── utils/
+│   │   │   ├── logger.util.ts
+│   │   │   └── helpers.util.ts
+│   │   └── types/
+│   │       └── index.d.ts
+│   └── main.ts
+├── test/
+│   ├── unit/                     # Unit tests
+│   ├── integration/              # Integration tests
+│   └── e2e/                      # End-to-end tests
+├── prisma/
+│   ├── schema.prisma
+│   ├── migrations/
+│   └── seed.ts
+├── docker/
+│   ├── Dockerfile                # Production image
+│   ├── Dockerfile.dev            # Development image
+│   └── .dockerignore
+├── k8s/
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   ├── ingress.yaml
+│   ├── configmap.yaml
+│   ├── secret.yaml
+│   ├── hpa.yaml                  # Horizontal Pod Autoscaler
+│   └── pdb.yaml                  # Pod Disruption Budget
+├── proto/                        # gRPC proto files (if applicable)
+│   └── service.proto
+├── .github/
+│   └── workflows/
+│       ├── ci.yml
+│       └── cd.yml
+├── scripts/
+│   ├── build.sh
+│   ├── deploy.sh
+│   └── migrate.sh
+├── .env.example
+├── .env.development
+├── .env.production
+├── .eslintrc.js
+├── .prettierrc
+├── .dockerignore
+├── .gitignore
+├── docker-compose.yml
+├── docker-compose.dev.yml
+├── Jenkinsfile
+├── nest-cli.json
+├── tsconfig.json
+├── tsconfig.build.json
+├── package.json
+└── README.md
