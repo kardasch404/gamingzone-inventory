@@ -150,3 +150,13 @@ enum AlertSeverity {
   WARNING
   CRITICAL
 }
+
+model ProcessedEvent {
+  eventId     String   @id
+  eventType   String
+  processedAt DateTime @default(now())
+
+  @@index([eventType])
+  @@index([processedAt])
+  @@map("processed_events")
+}
