@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { CheckStockAvailabilityHandler } from '../../../application/use-cases/queries/check-stock-availability.handler';
 import { AddStockUseCase } from '../../../application/use-cases/commands/add-stock.use-case';
 import { AdjustStockUseCase } from '../../../application/use-cases/commands/adjust-stock.use-case';
 import { GetLowStockAlertsHandler } from '../../../application/use-cases/queries/get-low-stock-alerts.handler';
 import { AddStockRequestDTO, AdjustStockRequestDTO, CheckAvailabilityRequestDTO } from '../../../application/dto/request/stock-request.dto';
+import { AdminGuard } from '../../guards/admin.guard';
 
 @ApiTags('Stock')
 @Controller('api/inventory/stock')
@@ -31,6 +32,8 @@ export class StockController {
   }
 
   @Post(':sku/add')
+  @UseGuards(AdminGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Add stock (Admin only)' })
   @ApiResponse({ status: 200, description: 'Stock added successfully' })
   async addStock(@Param('sku') sku: string, @Body() body: AddStockRequestDTO) {
@@ -44,6 +47,8 @@ export class StockController {
   }
 
   @Post(':sku/adjust')
+  @UseGuards(AdminGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Adjust stock (Admin only)' })
   @ApiResponse({ status: 200, description: 'Stock adjusted successfully' })
   async adjustStock(@Param('sku') sku: string, @Body() body: AdjustStockRequestDTO) {
@@ -58,6 +63,8 @@ export class StockController {
   }
 
   @Get('alerts/low-stock')
+  @UseGuards(AdminGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get low stock alerts (Admin only)' })
   @ApiResponse({ status: 200, description: 'Low stock alerts retrieved' })
   async getLowStockAlerts(@Query('warehouseId') warehouseId?: string) {
