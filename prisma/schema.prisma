@@ -7,10 +7,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Warehouse {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  code      String   @unique
+  address   String?
+  city      String?
+  country   String   @default("Morocco")
+  isActive  Boolean  @default(true)
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  stocks    Stock[]
+  
+  @@map("warehouses")
+}
+
 model Stock {
   id           String    @id @default(uuid())
   sku          String    // References Product.sku in Catalog service
   warehouseId  String
+  warehouse    Warehouse @relation(fields: [warehouseId], references: [id])
   
   quantity     Int       @default(0) // Total available
   reserved     Int       @default(0) // Reserved for pending orders
