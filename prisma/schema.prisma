@@ -25,9 +25,77 @@ model Stock {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   
+  movements    StockMovement[]
+  reservations StockReservation[]
+  
   @@unique([sku, warehouseId])
   @@index([sku])
   @@index([warehouseId])
   @@index([available])
   @@map("stocks")
+}
+
+model StockMovement {
+  id          String       @id @default(uuid())
+  stockId     String
+  stock       Stock        @relation(fields: [stockId], references: [id])
+  
+  type        MovementType
+  quantity    Int
+  reason      String?
+  referenceId String?
+  
+  beforeQty   Int
+  afterQty    Int
+  
+  performedBy String?
+  notes       String?
+  
+  createdAt   DateTime     @default(now())
+  
+  @@index([stockId])
+  @@index([type])
+  @@index([referenceId])
+  @@index([createdAt])
+  @@map("stock_movements")
+}
+
+enum MovementType {
+  IN
+  OUT
+  ADJUSTMENT
+  RESERVED
+  RELEASED
+  DAMAGED
+  RETURNED
+}
+
+model StockReservation {
+  id         String            @id @default(uuid())
+  stockId    String
+  stock      Stock             @relation(fields: [stockId], references: [id])
+  
+  orderId    String            @unique
+  quantity   Int
+  status     ReservationStatus @default(ACTIVE)
+  
+  reservedAt DateTime          @default(now())
+  expiresAt  DateTime
+  releasedAt DateTime?
+  
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  
+  @@index([stockId])
+  @@index([orderId])
+  @@index([status])
+  @@index([expiresAt])
+  @@map("stock_reservations")
+}
+
+enum ReservationStatus {
+  ACTIVE
+  FULFILLED
+  RELEASED
+  EXPIRED
 }
