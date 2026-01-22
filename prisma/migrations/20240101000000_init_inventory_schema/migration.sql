@@ -1,3 +1,29 @@
+-- Enable UUID v7 extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Create UUID v7 function
+CREATE OR REPLACE FUNCTION uuid_generate_v7()
+RETURNS uuid
+AS $$
+BEGIN
+  RETURN encode(
+    set_byte(
+      set_byte(
+        overlay(uuid_send(gen_random_uuid())
+          placing substring(int8send(floor(extract(epoch from clock_timestamp()) * 1000)::bigint) from 3)
+          from 1 for 6
+        ),
+        6, (get_byte(uuid_send(gen_random_uuid()), 6) & 15) | 112
+      ),
+      8, (get_byte(uuid_send(gen_random_uuid()), 8) & 63) | 128
+    ),
+    'hex'
+  )::uuid;
+END
+$$
+LANGUAGE plpgsql
+VOLATILE;
+
 -- CreateEnum
 CREATE TYPE "MovementType" AS ENUM ('IN', 'OUT', 'ADJUSTMENT', 'RESERVED', 'RELEASED', 'DAMAGED', 'RETURNED');
 
@@ -12,7 +38,7 @@ CREATE TYPE "AlertSeverity" AS ENUM ('INFO', 'WARNING', 'CRITICAL');
 
 -- CreateTable
 CREATE TABLE "warehouses" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL DEFAULT uuid_generate_v7(),
     "name" TEXT NOT NULL,
     "code" TEXT NOT NULL,
     "address" TEXT,
@@ -28,7 +54,7 @@ CREATE TABLE "warehouses" (
 
 -- CreateTable
 CREATE TABLE "stocks" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL DEFAULT uuid_generate_v7(),
     "sku" TEXT NOT NULL,
     "warehouseId" TEXT NOT NULL,
     "quantity" INTEGER NOT NULL DEFAULT 0,
@@ -46,7 +72,7 @@ CREATE TABLE "stocks" (
 
 -- CreateTable
 CREATE TABLE "stock_movements" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL DEFAULT uuid_generate_v7(),
     "stockId" TEXT NOT NULL,
     "type" "MovementType" NOT NULL,
     "quantity" INTEGER NOT NULL,
@@ -63,7 +89,7 @@ CREATE TABLE "stock_movements" (
 
 -- CreateTable
 CREATE TABLE "stock_reservations" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL DEFAULT uuid_generate_v7(),
     "stockId" TEXT NOT NULL,
     "orderId" TEXT NOT NULL,
     "quantity" INTEGER NOT NULL,
@@ -79,7 +105,7 @@ CREATE TABLE "stock_reservations" (
 
 -- CreateTable
 CREATE TABLE "stock_alerts" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL DEFAULT uuid_generate_v7(),
     "sku" TEXT NOT NULL,
     "warehouseId" TEXT NOT NULL,
     "alertType" "AlertType" NOT NULL,
