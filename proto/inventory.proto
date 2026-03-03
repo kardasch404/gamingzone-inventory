@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package inventory;
+
+service InventoryService {
+  rpc CheckAvailability(CheckAvailabilityRequest) returns (AvailabilityResponse);
+  rpc ReserveStock(ReserveStockRequest) returns (ReservationResponse);
+  rpc ReleaseReservation(ReleaseReservationRequest) returns (ReleaseResponse);
+  rpc DeductStock(DeductStockRequest) returns (DeductResponse);
+}
+
+message CheckAvailabilityRequest {
+  string sku = 1;
+  int32 quantity = 2;
+  string warehouseId = 3;
+}
+
+message AvailabilityResponse {
+  bool available = 1;
+  int32 availableQuantity = 2;
+}
+
+message ReserveStockRequest {
+  string sku = 1;
+  int32 quantity = 2;
+  string orderId = 3;
+  string warehouseId = 4;
+}
+
+message ReservationResponse {
+  string reservationId = 1;
+  string expiresAt = 2;
+  bool success = 3;
+}
+
+message ReleaseReservationRequest {
+  string orderId = 1;
+}
+
+message ReleaseResponse {
+  bool success = 1;
+}
+
+message DeductStockRequest {
+  string orderId = 1;
+}
+
+message DeductResponse {
+  bool success = 1;
+}
